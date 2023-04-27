@@ -25,6 +25,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "system.h"
+#include "communicator.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,15 +99,18 @@ int main(void)
 		  &htim3,
 		  GPIOB, // GPIOB is already a GPIO_TypeDef pointer
 		  LD3_Pin,
-		  LD1_Pin);
+		  LD1_Pin,
+		  8);
   /* USER CODE END 2 */
 
   /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
+
   while (1)
   {
+	  /* USER CODE BEGIN WHILE */
+	system_main(&my_sys);
     /* USER CODE END WHILE */
-	  system_main(&my_sys); // call main loop function
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

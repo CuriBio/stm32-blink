@@ -1,3 +1,4 @@
+"./Core/Src/communicator.o"
 "./Core/Src/gpio.o"
 "./Core/Src/it.o"
 "./Core/Src/main.o"
