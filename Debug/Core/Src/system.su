@@ -1,3 +1,0 @@
-../Core/Src/system.c:12:6:init_system	24	static
-../Core/Src/system.c:43:6:system_main	24	static
-../Core/Src/system.c:80:6:commandHandler	24	static
