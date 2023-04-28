@@ -6,7 +6,7 @@
  */
 
 #include "communicator.h"
-//#include "stdlib.h"
+#include "stdlib.h"
 
 RingBuffer_t * ring_buffer_init(uint32_t size_buffer /*, Thread_Code_t this_thread_code*/) {
 	RingBuffer_t * buffer_s = (RingBuffer_t*)malloc(sizeof(RingBuffer_t));
