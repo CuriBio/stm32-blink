@@ -30,6 +30,7 @@ typedef struct __RingBuffer {
 } RingBuffer_t;
 
 typedef enum Command_t{
+	OFF 		= 	0,
 	LED1_5Hz 	= 	97, // 'a'
 	LED1_1Hz 	= 	115, // 's'
 	LED2_5Hz 	= 	100, // 'd'

@@ -26,19 +26,15 @@ typedef struct
 
 	uint8_t LEDToggle1;
 	uint8_t LEDToggle2;
-	bool_t begin_LED1;
-	bool_t begin_LED2;
+	Command_t LED1_State;
+	Command_t LED2_State;
 
 	TIM_HandleTypeDef *LED1_timer;
 	TIM_HandleTypeDef *LED2_timer;
 	TIM_HandleTypeDef *handshakeTimer;
 	uint8_t *incomingByte;
 
-
 	RingBuffer_t *receive_ring_buffer;
-
-	bool_t received_input;
-	uint8_t outData[];
 } System;
 
 

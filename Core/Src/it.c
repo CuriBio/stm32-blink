@@ -20,8 +20,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	}
 	if (htim == (&my_sys)->handshakeTimer) {
 		my_sys.receive_ring_buffer->push(my_sys.receive_ring_buffer, HANDSHAKE_ARE_YOU_THERE);
-		my_sys.begin_LED1 = FALSE;
-		my_sys.begin_LED2 = FALSE;
+		my_sys.LED1_State = OFF;
+		my_sys.LED2_State = OFF;
 	}
 }
 
@@ -29,7 +29,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
 	if (huart==&huart3) {
 		my_sys.handshakeTimer->Instance->CNT=0;
-		my_sys.received_input = TRUE;
+//		my_sys.received_input = TRUE;
 		my_sys.receive_ring_buffer->push(my_sys.receive_ring_buffer, *my_sys.incomingByte);
 
 
@@ -41,7 +41,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 
 	if (huart==&huart3) {
-		my_sys.received_input = FALSE;
+//		my_sys.received_input = FALSE;
 	}
 
 }
