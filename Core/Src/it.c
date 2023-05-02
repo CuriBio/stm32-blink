@@ -19,9 +19,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		(&my_sys)->LEDToggle2 = 1; // flip flag
 	}
 	if (htim == (&my_sys)->handshakeTimer) {
-		my_sys.receive_ring_buffer->push(my_sys.receive_ring_buffer, HANDSHAKE_ARE_YOU_THERE);
-		my_sys.LED1_State = OFF;
-		my_sys.LED2_State = OFF;
+		my_sys.receive_ring_buffer->push(my_sys.receive_ring_buffer, HANDSHAKE_ARE_YOU_THERE); // add a command to the ring buffer
+
 	}
 }
 
@@ -41,6 +40,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 
 	if (huart==&huart3) {
+//		my_sys.tx_complete = TRUE;
 //		my_sys.received_input = FALSE;
 	}
 

@@ -12,19 +12,22 @@
 extern UART_HandleTypeDef huart3;
 
 
-extern TIM_HandleTypeDef htim2;
-extern TIM_HandleTypeDef htim3;
-extern TIM_HandleTypeDef htim4;
+//extern TIM_HandleTypeDef htim2;
+//extern TIM_HandleTypeDef htim3;
+//extern TIM_HandleTypeDef htim4;
 
 
 void init_system(System *sys,
+		TIM_HandleTypeDef *h_timer1,
+		TIM_HandleTypeDef *h_timer2,
+		TIM_HandleTypeDef *handshakeTimer,
 		GPIO_TypeDef *h_GPIO,
 		uint16_t LEDPin1, uint16_t LEDPin2 ,
 		uint16_t size_of_receive_buffer) {
 
 	// fill my_sys with pointers and variables
-	sys->h_timer1 = &htim2;
-	sys->h_timer2 = &htim3;
+	sys->h_timer1 = h_timer1;
+	sys->h_timer2 = h_timer2;
 	sys->h_GPIO_LED = h_GPIO;
 	sys->LEDPin1 = LEDPin1;
 	sys->LEDPin2 = LEDPin2;
@@ -43,7 +46,7 @@ void init_system(System *sys,
 	sys->receive_ring_buffer = ring_buffer_init(size_of_receive_buffer /*, Thread_Code_t this_thread_code*/);
 
 //	sys->received_input = FALSE;
-	sys->handshakeTimer = &htim4;
+	sys->handshakeTimer = handshakeTimer;
 
 	// begin interrupts
 	HAL_TIM_Base_Start_IT(sys->LED1_timer);
@@ -72,11 +75,11 @@ void system_main(System *sys) {
 		 * if (flag is raised)
 		 * 		perform action, which also lowers flag
 		 * */
-		if (sys->LEDToggle1 == 1 && sys->LED1_State != OFF) { // check if flag is raised
+		if (sys->LEDToggle1 == 1 && sys->LED1_State != OFF) { // check if flag is raised and LED1 is enabled
 			sys->LEDToggle1 = 0; // lower flag
 			HAL_GPIO_TogglePin(sys->h_GPIO_LED, sys->LEDPin1); // toggle pin
 		}
-		if (sys->LEDToggle2 == 1 && sys->LED2_State != OFF) { // check if flag is raised
+		if (sys->LEDToggle2 == 1 && sys->LED2_State != OFF) { // check if flag is raised and LED2 is enabled
 			sys->LEDToggle2 = 0; // lower flag
 			HAL_GPIO_TogglePin(sys->h_GPIO_LED, sys->LEDPin2); // toggle pin
 		}
@@ -87,29 +90,26 @@ void system_main(System *sys) {
 		}
 
 
-
-
-
 	}
 }
 
 
 void commandHandler(System *sys) {
+	HAL_UART_Receive_IT(&huart3, sys->incomingByte, SIZE_INCOMING_DATA); // allow for more receives
 	uint8_t command;
 	uint8_t status_error = pop_ring_buffer(sys->receive_ring_buffer, &command);
 	if (!status_error) {
+		while (huart3.gState != HAL_UART_STATE_READY) {}
 
 		if (command == sys->LED1_State) {
 			sys->LED1_State = OFF;
 			HAL_GPIO_WritePin(sys->h_GPIO_LED, sys->LEDPin1, GPIO_PIN_RESET);
 			HAL_UART_Transmit_IT(&huart3, (uint8_t*)"Turning LED1 OFF.\n", sizeof("Turning LED1 OFF.\n"));
-
 		}
 		else if (command == sys->LED2_State) {
 			sys->LED2_State = OFF;
 			HAL_GPIO_WritePin(sys->h_GPIO_LED, sys->LEDPin2, GPIO_PIN_RESET);
 			HAL_UART_Transmit_IT(&huart3, (uint8_t*)"Turning LED2 OFF.\n", sizeof("Turning LED2 OFF.\n"));
-
 		}
 		else {
 			switch (command) {
@@ -136,12 +136,13 @@ void commandHandler(System *sys) {
 
 			case HANDSHAKE_ARE_YOU_THERE:
 				HAL_UART_Transmit_IT(&huart3, (uint8_t*)"Are you still there?\n", sizeof("Are you still there?\n"));
+				sys->LED1_State = OFF;
+				sys->LED2_State = OFF;
 				HAL_GPIO_WritePin(sys->h_GPIO_LED, sys->LEDPin1, GPIO_PIN_RESET);
 				HAL_GPIO_WritePin(sys->h_GPIO_LED, sys->LEDPin2, GPIO_PIN_RESET);
 				break;
 			}
 		}
-		HAL_UART_Receive_IT(&huart3, sys->incomingByte, SIZE_INCOMING_DATA); // allow for more receives
 
 	}
 

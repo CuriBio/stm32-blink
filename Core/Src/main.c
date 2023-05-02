@@ -96,16 +96,17 @@ int main(void)
 
   // initialize system variable
   init_system(&my_sys,
+		  &htim2, &htim3, &htim4,
 		  GPIOB, // GPIOB is already a GPIO_TypeDef pointer
-		  LD3_Pin,
-		  LD1_Pin,
+		  LD3_Pin, LD1_Pin,
 		  8);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-	system_main(&my_sys);
+	  system_main(&my_sys);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
