@@ -10,7 +10,7 @@
 
 #include "main.h"
 //#include "system.h"
-extern UART_HandleTypeDef huart3;
+//extern UART_HandleTypeDef huart3;
 
 
 
@@ -30,10 +30,12 @@ typedef struct __RingBuffer {
 } RingBuffer_t;
 
 typedef enum Command_t{
+	OFF 		= 	0,
 	LED1_5Hz 	= 	97, // 'a'
 	LED1_1Hz 	= 	115, // 's'
 	LED2_5Hz 	= 	100, // 'd'
-	LED2_1Hz 	= 	102 // 'f'
+	LED2_1Hz 	= 	102, // 'f'
+	HANDSHAKE_ARE_YOU_THERE = 103
 } Command_t;
 
 RingBuffer_t * ring_buffer_init(uint32_t size_buffer /*, Thread_Code_t this_thread_code*/);

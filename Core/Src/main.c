@@ -91,24 +91,23 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
 
   // initialize system variable
   init_system(&my_sys,
-		  &htim2,
-		  &htim3,
+		  &htim2, &htim3, &htim4,
 		  GPIOB, // GPIOB is already a GPIO_TypeDef pointer
-		  LD3_Pin,
-		  LD1_Pin,
+		  LD3_Pin, LD1_Pin,
+		  &huart3,
 		  8);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
-
-  while (1)
-  {
-	  /* USER CODE BEGIN WHILE */
-	system_main(&my_sys);
+  /* USER CODE BEGIN WHILE */
+  while (1) {
+	  system_main(&my_sys);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
