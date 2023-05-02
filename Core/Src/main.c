@@ -99,6 +99,7 @@ int main(void)
 		  &htim2, &htim3, &htim4,
 		  GPIOB, // GPIOB is already a GPIO_TypeDef pointer
 		  LD3_Pin, LD1_Pin,
+		  &huart3,
 		  8);
 
   /* USER CODE END 2 */

@@ -34,6 +34,7 @@ typedef struct
 	TIM_HandleTypeDef *handshakeTimer;
 	uint8_t *incomingByte;
 
+	UART_HandleTypeDef *h_uart;
 	bool_t tx_complete;
 
 	RingBuffer_t *receive_ring_buffer;
@@ -46,6 +47,7 @@ void init_system(System *sys,
 		TIM_HandleTypeDef *handshakeTimer,
 		GPIO_TypeDef *h_GPIO,
 		uint16_t LEDPin1, uint16_t LEDPin2,
+		UART_HandleTypeDef *h_uart,
 		uint16_t size_of_receive_buffer);
 void system_main(System *sys);
 void commandHandler(System *sys);

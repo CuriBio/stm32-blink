@@ -9,7 +9,7 @@
 #include "stdlib.h"
 
 //extern System my_sys;
-extern UART_HandleTypeDef huart3;
+//extern UART_HandleTypeDef huart3;
 
 
 //extern TIM_HandleTypeDef htim2;
@@ -23,6 +23,7 @@ void init_system(System *sys,
 		TIM_HandleTypeDef *handshakeTimer,
 		GPIO_TypeDef *h_GPIO,
 		uint16_t LEDPin1, uint16_t LEDPin2 ,
+		UART_HandleTypeDef *h_uart,
 		uint16_t size_of_receive_buffer) {
 
 	// fill my_sys with pointers and variables
@@ -45,6 +46,7 @@ void init_system(System *sys,
 	sys->incomingByte = (uint8_t*)malloc(sizeof(uint8_t*));
 	sys->receive_ring_buffer = ring_buffer_init(size_of_receive_buffer /*, Thread_Code_t this_thread_code*/);
 
+	sys->h_uart = h_uart;
 //	sys->received_input = FALSE;
 	sys->handshakeTimer = handshakeTimer;
 
@@ -54,7 +56,7 @@ void init_system(System *sys,
 	HAL_TIM_Base_Start_IT(sys->handshakeTimer);
 
 
-	HAL_UART_Receive_IT(&huart3, sys->incomingByte, SIZE_INCOMING_DATA); // begin UART IT
+	HAL_UART_Receive_IT(sys->h_uart, sys->incomingByte, SIZE_INCOMING_DATA); // begin UART IT
 }
 
 
@@ -95,47 +97,47 @@ void system_main(System *sys) {
 
 
 void commandHandler(System *sys) {
-	HAL_UART_Receive_IT(&huart3, sys->incomingByte, SIZE_INCOMING_DATA); // allow for more receives
+	HAL_UART_Receive_IT(sys->h_uart, sys->incomingByte, SIZE_INCOMING_DATA); // allow for more receives
 	uint8_t command;
 	uint8_t status_error = pop_ring_buffer(sys->receive_ring_buffer, &command);
 	if (!status_error) {
-		while (huart3.gState != HAL_UART_STATE_READY) {}
+		while (sys->h_uart->gState != HAL_UART_STATE_READY) {}
 
 		if (command == sys->LED1_State) {
 			sys->LED1_State = OFF;
 			HAL_GPIO_WritePin(sys->h_GPIO_LED, sys->LEDPin1, GPIO_PIN_RESET);
-			HAL_UART_Transmit_IT(&huart3, (uint8_t*)"Turning LED1 OFF.\n", sizeof("Turning LED1 OFF.\n"));
+			HAL_UART_Transmit_IT(sys->h_uart, (uint8_t*)"Turning LED1 OFF.\n", sizeof("Turning LED1 OFF.\n"));
 		}
 		else if (command == sys->LED2_State) {
 			sys->LED2_State = OFF;
 			HAL_GPIO_WritePin(sys->h_GPIO_LED, sys->LEDPin2, GPIO_PIN_RESET);
-			HAL_UART_Transmit_IT(&huart3, (uint8_t*)"Turning LED2 OFF.\n", sizeof("Turning LED2 OFF.\n"));
+			HAL_UART_Transmit_IT(sys->h_uart, (uint8_t*)"Turning LED2 OFF.\n", sizeof("Turning LED2 OFF.\n"));
 		}
 		else {
 			switch (command) {
 			case LED1_5Hz:
 				sys->LED1_timer = sys->h_timer1; // use h_timer1 as the LED1 timer
 				sys->LED1_State = command;
-				HAL_UART_Transmit_IT(&huart3, (uint8_t*)"Blinking LED1 at 5 Hz.\n", sizeof("Blinking LED1 at 5 Hz.\n"));
+				HAL_UART_Transmit_IT(sys->h_uart, (uint8_t*)"Blinking LED1 at 5 Hz.\n", sizeof("Blinking LED1 at 5 Hz.\n"));
 				break;
 			case LED1_1Hz:
 				sys->LED1_timer = sys->h_timer2; // use h_timer2 as the LED1 timer
 				sys->LED1_State = command;
-				HAL_UART_Transmit_IT(&huart3, (uint8_t*)"Blinking LED1 at 1 Hz.\n", sizeof("Blinking LED1 at 1 Hz.\n"));
+				HAL_UART_Transmit_IT(sys->h_uart, (uint8_t*)"Blinking LED1 at 1 Hz.\n", sizeof("Blinking LED1 at 1 Hz.\n"));
 				break;
 			case LED2_5Hz:
 				sys->LED2_timer = sys->h_timer1; // use h_timer1 as the LED2 timer
 				sys->LED2_State = command;
-				HAL_UART_Transmit_IT(&huart3, (uint8_t*)"Blinking LED2 at 5 Hz.\n", sizeof("Blinking LED2 at 5 Hz.\n"));
+				HAL_UART_Transmit_IT(sys->h_uart, (uint8_t*)"Blinking LED2 at 5 Hz.\n", sizeof("Blinking LED2 at 5 Hz.\n"));
 				break;
 			case LED2_1Hz:
 				sys->LED2_timer = sys->h_timer2; // use h_timer2 as the LED2 timer
 				sys->LED2_State = command;
-				HAL_UART_Transmit_IT(&huart3, (uint8_t*)"Blinking LED2 at 1 Hz.\n", sizeof("Blinking LED2 at 1 Hz.\n"));
+				HAL_UART_Transmit_IT(sys->h_uart, (uint8_t*)"Blinking LED2 at 1 Hz.\n", sizeof("Blinking LED2 at 1 Hz.\n"));
 				break;
 
 			case HANDSHAKE_ARE_YOU_THERE:
-				HAL_UART_Transmit_IT(&huart3, (uint8_t*)"Are you still there?\n", sizeof("Are you still there?\n"));
+				HAL_UART_Transmit_IT(sys->h_uart, (uint8_t*)"Are you still there?\n", sizeof("Are you still there?\n"));
 				sys->LED1_State = OFF;
 				sys->LED2_State = OFF;
 				HAL_GPIO_WritePin(sys->h_GPIO_LED, sys->LEDPin1, GPIO_PIN_RESET);
